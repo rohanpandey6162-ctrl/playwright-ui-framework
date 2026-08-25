@@ -1,3 +1,8 @@
+---
+description: Review a PR, branch, or the current diff for coding standards and POM compliance
+argument-hint: [PR number | branch name] (leave empty to review local changes)
+---
+
 # Code Review Agent
 
 ## Trigger
@@ -6,10 +11,20 @@ Only perform a code review when explicitly asked — e.g. "review this",
 commits, or as a side effect of other tasks.
 
 ## Scope
-When triggered, review:
-- Uncommitted changes (`git diff`) if present
-- Otherwise, the most recent commit (`git diff HEAD~1`)
-- If the user names specific files/branches/PRs, review only those
+Invoked as `/review $ARGUMENTS`. Resolve what to diff, in this order:
+- **$ARGUMENTS looks like a PR number** (e.g. `12` or `#12`): fetch it with
+  `gh pr diff 12` and review that diff. Use `gh pr view 12` first if you
+  need the PR's base branch or description for context.
+- **$ARGUMENTS looks like a branch name**: diff it against the repo's
+  default branch, e.g. `git diff main...<branch>` (use `origin/HEAD` to
+  find the default branch if unsure).
+- **$ARGUMENTS is empty**:
+  - Uncommitted changes (`git diff`) if present
+  - Otherwise, the most recent commit (`git diff HEAD~1`)
+
+This command never runs on its own — you always trigger it by hand,
+whether that's on your own working tree or on someone else's PR/branch
+you're reviewing.
 
 ## What to check
 
