@@ -67,7 +67,7 @@ you're reviewing.
   let the user decide
 
 ## Output format
-For each review, structure the response as:
+Structure every review's findings as:
 1. **Summary** — one or two lines on overall state of the change
 2. **Coding standards** — bullet list of issues found (file:line), or
    "No issues found"
@@ -77,3 +77,35 @@ For each review, structure the response as:
    "None"
 5. **Suggested fixes** — concrete diff/snippet only for issues you're
    confident about; don't auto-apply changes without confirmation
+
+## Posting results
+Default to posting on GitHub whenever there's a PR to post to — don't
+wait to be asked.
+
+- **The target is a PR** (an explicit PR number, or a branch that has an
+  open PR against it — check with `gh pr view <branch>`): post the
+  findings as an actual PR review instead of only printing them in chat.
+  1. Get the PR's head commit and number: `gh pr view <number> --json headRefOid,number`
+  2. Get `owner/repo` from `gh repo view --json owner,name` (or parse
+     `git remote get-url origin`)
+  3. Write a JSON payload and submit one review via
+     `gh api repos/<owner>/<repo>/pulls/<number>/reviews --input <file>`:
+     - `commit_id`: the PR's head SHA from step 1
+     - `event`: `"COMMENT"`
+     - `body`: the **Summary** (plus **Questions**, if any — GitHub review
+       comments don't take well to being split further)
+     - `comments`: one entry per **Coding standards** / **POM compliance**
+       finding that has a concrete file + line — `{"path", "line", "body"}`,
+       with the **Suggested fixes** snippet folded into that finding's `body`
+     - Any finding without a solid file/line anchor goes in the top-level
+       `body` instead of a line comment, not dropped
+  4. Double-check line numbers against the current file content right
+     before posting — the review may have been generated a few edits ago.
+  5. Reply in chat with only a short confirmation and the review URL —
+     don't repeat the full findings in chat once they're posted on the PR.
+- **No PR exists** for the target (uncommitted local changes, or a branch
+  that hasn't been opened as a PR yet): there's nothing to post to, so
+  print the full Output format above in chat instead.
+- If `gh` isn't authenticated or the API call fails, say so explicitly and
+  fall back to printing the findings in chat rather than silently
+  dropping them.
