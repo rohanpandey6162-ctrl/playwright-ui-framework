@@ -53,3 +53,16 @@ def test_locked_out_user_is_denied_access(page):
     assert login_page.is_error_displayed()
     assert "locked out" in login_page.get_error_message().lower()
     assert login_page.is_login_button_visible()
+
+
+@pytest.mark.regression
+@pytest.mark.login
+def test_direct_inventory_access_without_login_shows_error(page):
+    """Navigating straight to the inventory URL without logging in should be rejected."""
+    login_page = LoginPage(page)
+    inventory_page = InventoryPage(page)
+    inventory_page.load()
+
+    assert not inventory_page.is_loaded()
+    assert login_page.is_error_displayed()
+    assert "logged in" in login_page.get_error_message().lower()
