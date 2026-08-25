@@ -24,6 +24,8 @@ class CartPage(BasePage):
     # Checkout step two (overview)
     FINISH_BUTTON = "#finish"
     TOTAL_LABEL = ".summary_total_label"
+    SUBTOTAL_LABEL = "[data-test='subtotal-label']"
+    TAX_LABEL = "[data-test='tax-label']"
 
     # Checkout complete
     COMPLETE_HEADER = ".complete-header"
@@ -74,6 +76,18 @@ class CartPage(BasePage):
     def get_total_label_text(self) -> str:
         """Return the total price label text from the checkout overview step."""
         return self.get_text(self.TOTAL_LABEL)
+
+    def get_subtotal(self) -> float:
+        """Return the item subtotal (before tax) from the checkout overview step."""
+        return float(self.get_text(self.SUBTOTAL_LABEL).split("$")[-1])
+
+    def get_tax(self) -> float:
+        """Return the tax amount from the checkout overview step."""
+        return float(self.get_text(self.TAX_LABEL).split("$")[-1])
+
+    def get_total(self) -> float:
+        """Return the order total from the checkout overview step."""
+        return float(self.get_text(self.TOTAL_LABEL).split("$")[-1])
 
     def finish_checkout(self) -> None:
         """Click 'Finish' on the checkout overview step to complete the order."""
