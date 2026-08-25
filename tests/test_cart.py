@@ -66,6 +66,25 @@ def test_full_checkout_flow_completes_order(logged_in_page):
 
 @pytest.mark.regression
 @pytest.mark.cart
+def test_checkout_total_matches_subtotal_plus_tax(logged_in_page):
+    """The checkout overview total should equal the item subtotal plus tax."""
+    inventory_page = InventoryPage(logged_in_page)
+    inventory_page.add_product_to_cart_by_name("Sauce Labs Backpack")
+    inventory_page.go_to_cart()
+
+    cart_page = CartPage(logged_in_page)
+    cart_page.proceed_to_checkout()
+    cart_page.fill_checkout_information("Jane", "Doe", "94107")
+
+    subtotal = cart_page.get_subtotal()
+    tax = cart_page.get_tax()
+    total = cart_page.get_total()
+
+    assert total == pytest.approx(subtotal + tax, abs=0.01)
+
+
+@pytest.mark.regression
+@pytest.mark.cart
 def test_checkout_requires_first_name(logged_in_page):
     """Attempting checkout without a first name should show a validation error."""
     inventory_page = InventoryPage(logged_in_page)
