@@ -33,6 +33,16 @@ def test_sort_products_name_z_to_a(logged_in_page):
     assert names == sorted(names, reverse=True)
 
 
+@pytest.mark.regression
+def test_sort_products_price_high_to_low(logged_in_page):
+    """Sorting by 'Price (high to low)' should order products descending by price."""
+    inventory_page = InventoryPage(logged_in_page)
+    inventory_page.sort_by("hilo")
+
+    prices = inventory_page.get_product_prices()
+    assert prices == sorted(prices, reverse=True)
+
+
 @pytest.mark.smoke
 @pytest.mark.cart
 def test_add_single_product_updates_cart_badge(logged_in_page):

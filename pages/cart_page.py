@@ -82,3 +82,7 @@ class CartPage(BasePage):
     def get_complete_header(self) -> str:
         """Return the confirmation header text shown after a completed order."""
         return self.get_text(self.COMPLETE_HEADER)
+
+    def go_back_to_products(self) -> None:
+        """Click 'Back Home' on the order confirmation step to return to inventory."""
+        self.click_element(self.BACK_HOME_BUTTON)

@@ -77,3 +77,51 @@ def test_checkout_requires_first_name(logged_in_page):
     cart_page.fill_checkout_information("", "Doe", "94107")
 
     assert "First Name is required" in cart_page.get_checkout_error()
+
+
+@pytest.mark.regression
+@pytest.mark.cart
+def test_checkout_requires_last_name(logged_in_page):
+    """Attempting checkout without a last name should show a validation error."""
+    inventory_page = InventoryPage(logged_in_page)
+    inventory_page.add_product_to_cart_by_name("Sauce Labs Backpack")
+    inventory_page.go_to_cart()
+
+    cart_page = CartPage(logged_in_page)
+    cart_page.proceed_to_checkout()
+    cart_page.fill_checkout_information("Jane", "", "94107")
+
+    assert "Last Name is required" in cart_page.get_checkout_error()
+
+
+@pytest.mark.regression
+@pytest.mark.cart
+def test_checkout_requires_postal_code(logged_in_page):
+    """Attempting checkout without a postal code should show a validation error."""
+    inventory_page = InventoryPage(logged_in_page)
+    inventory_page.add_product_to_cart_by_name("Sauce Labs Backpack")
+    inventory_page.go_to_cart()
+
+    cart_page = CartPage(logged_in_page)
+    cart_page.proceed_to_checkout()
+    cart_page.fill_checkout_information("Jane", "Doe", "")
+
+    assert "Postal Code is required" in cart_page.get_checkout_error()
+
+
+@pytest.mark.regression
+@pytest.mark.cart
+def test_back_to_products_returns_to_inventory_after_order(logged_in_page):
+    """After completing an order, 'Back Home' should return the user to the inventory page."""
+    inventory_page = InventoryPage(logged_in_page)
+    inventory_page.add_product_to_cart_by_name("Sauce Labs Backpack")
+    inventory_page.go_to_cart()
+
+    cart_page = CartPage(logged_in_page)
+    cart_page.proceed_to_checkout()
+    cart_page.fill_checkout_information("Jane", "Doe", "94107")
+    cart_page.finish_checkout()
+    cart_page.go_back_to_products()
+
+    assert "inventory.html" in inventory_page.url
+    assert inventory_page.is_loaded()
